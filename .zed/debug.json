@@ -1,0 +1,268 @@
+[
+  // ─────────────────────────────────────────────────────────────────────────
+  // PIPELINE - end-to-end CLI
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    "label": "Debug: BCI pipeline (5 sessions)",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "bci_dapp.cli",
+    "args": ["--n", "5"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: BCI pipeline (10 sessions, export)",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "bci_dapp.cli",
+    "args": ["--n", "10", "--export"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: BCI pipeline (LLM mode)",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "bci_dapp.cli",
+    "args": ["--n", "3", "--llm"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+      // Set OPENAI_API_KEY in .env or override here:
+      // "OPENAI_API_KEY": "sk-..."
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // PYTEST - test suite
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    "label": "Debug: pytest - all tests",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "pytest",
+    "args": ["tests/", "-v", "--no-cov", "--no-header"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: pytest - current test file",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "pytest",
+    "args": ["$ZED_FILE", "-v", "--no-cov"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: pytest - EEG Simulator tests",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "pytest",
+    "args": ["tests/test_eeg_simulator.py", "-v", "--no-cov"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: pytest - LLM Agent tests",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "pytest",
+    "args": ["tests/test_llm_agent.py", "-v", "--no-cov"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: pytest - Provenance & Ledger tests",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "pytest",
+    "args": ["tests/test_provenance_ledger.py", "-v", "--no-cov"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: pytest - fail-fast (-x)",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "pytest",
+    "args": ["tests/", "-v", "-x", "--no-cov"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: pytest - last failed only",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "pytest",
+    "args": ["--last-failed", "-v", "--no-cov"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // MODULE - step into individual source files
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    "label": "Debug: eeg_simulator.py",
+    "adapter": "debugpy",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/src/bci_dapp/eeg_simulator.py",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: blockchain_ledger.py",
+    "adapter": "debugpy",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/src/bci_dapp/blockchain_ledger.py",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: provenance.py",
+    "adapter": "debugpy",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/src/bci_dapp/provenance.py",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: llm_agent.py",
+    "adapter": "debugpy",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/src/bci_dapp/llm_agent.py",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: current file",
+    "adapter": "debugpy",
+    "request": "launch",
+    "program": "$ZED_FILE",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": false,
+  },
+  {
+    "label": "Debug: current file (stop on entry)",
+    "adapter": "debugpy",
+    "request": "launch",
+    "program": "$ZED_FILE",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": true,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ATTACH - connect to a running debugpy server
+  // Use when the process is started separately with:
+  //   python -m debugpy --listen 5678 --wait-for-client -m bci_dapp.cli
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    "label": "Debug: Attach to debugpy (port 5678)",
+    "adapter": "debugpy",
+    "request": "attach",
+    "connect": {
+      "host": "127.0.0.1",
+      "port": 5678,
+    },
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "justMyCode": false,
+    "pathMappings": [
+      {
+        "localRoot": "$ZED_WORKTREE_ROOT",
+        "remoteRoot": "$ZED_WORKTREE_ROOT",
+      },
+    ],
+  },
+]
