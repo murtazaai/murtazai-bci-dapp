@@ -9,7 +9,7 @@
 
 > **EEG signal simulation → rig-core LLM classification → Ed25519 provenance signing → SHA-256 blockchain ledger**
 
-A production-architecture Brain-Computer Interface (BCI) DApp pipeline. Designed for children with motor impairments, it turns raw EEG signals into cryptographically signed, tamper-evident session records committed to a hash-chained ledger - clinical-grade auditability without a full blockchain node.
+A production-architecture Brain-Computer Interface (BCI) DApp pipeline. Designed for children with motor impairments, it turns raw EEG signals into cryptographically signed, tamper-evident session records committed to a hash-chained ledger — clinical-grade auditability without a full blockchain node.
 
 ---
 
@@ -95,10 +95,9 @@ murtazai-bci-dapp/
 │   ├── test_llm_agent.py         # 13 tests
 │   └── test_provenance_ledger.py # 17 tests  ─── 41 total
 ├── .zed/
-│   ├── tasks.json                # 29 Zed task runner configs
-│   └── debug.json                # 17 DAP debugger configs
-├── .github/
-│   └── workflows/ci.yml          # Lint + test matrix (Python 3.11, 3.12)
+│   ├── settings.json             # Workspace LSP, formatter, terminal, and editor config
+│   ├── tasks.json                # 32 Zed task runner configs
+│   └── debug.json                # 18 DAP debugger configs
 ├── data/
 │   └── ledger.json               # Runtime ledger (gitignored)
 ├── pyproject.toml                # Build, deps, ruff, mypy, pytest, coverage
@@ -204,7 +203,7 @@ v = ledger.verify_chain()
 print(f"chain valid={v.valid}  blocks={ledger.height}")
 ```
 
-To point `BCIAgent` at a local rig-core or Ollama instance - no other code changes needed:
+To point `BCIAgent` at a local rig-core or Ollama instance — no other code changes needed:
 
 ```python
 agent = BCIAgent(base_url="http://localhost:11434/v1", model="llama3")
@@ -227,7 +226,7 @@ cp .env.example .env
 | `LOG_LEVEL` | `INFO` | Log level: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL` |
 | `LLM_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible endpoint (swap for rig-core/Ollama) |
 | `LLM_MODEL` | `gpt-4o-mini` | Model identifier passed to the completion endpoint |
-| `OPENAI_API_KEY` | _(empty)_ | API key - when absent, the rule-based classifier is used |
+| `OPENAI_API_KEY` | _(empty)_ | API key — when absent, the rule-based classifier is used |
 | `EEG_SAMPLING_RATE` | `256` | Simulated sample rate in Hz (matches Emotiv EPOC) |
 | `EEG_WINDOW_SEC` | `2.0` | Analysis window duration in seconds |
 | `LEDGER_PATH` | `data/ledger.json` | JSON file path for ledger persistence |
@@ -296,47 +295,65 @@ Hooks: `trailing-whitespace`, `end-of-file-fixer`, `check-yaml`, `check-toml`,
 
 GitHub Actions runs on every push and pull request to `main`/`master`:
 
-- **Lint job** - `ruff check`, `ruff format --check`, `mypy src/` (Python 3.12)
-- **Test job** - `pytest` on Python 3.11 and 3.12 in parallel; coverage uploaded to Codecov on 3.12
+- **Lint job** — `ruff check`, `ruff format --check`, `mypy src/` (Python 3.12)
+- **Test job** — `pytest` on Python 3.11 and 3.12 in parallel; coverage uploaded to Codecov on 3.12
 
 ---
 
 ## Zed IDE Integration
 
-`.zed/tasks.json` and `.zed/debug.json` are included for first-class Zed support.
+Three files under `.zed/` give Zed complete, project-aware intelligence for this repository.
 
-### Tasks (29 total) - `Ctrl+Shift+P` → `task: spawn`
+### `settings.json` — workspace intelligence
+
+Loaded automatically when you open the project root in Zed. Configures:
+
+- **Python LSP stack** — Pyright (strict type checking, `src/` on `extraPaths`) + Ruff LSP (lint + format). The Ruff settings mirror `[tool.ruff]` in `pyproject.toml` exactly: `line-length = 100`, same rule selects/ignores, `quote-style = "double"`.
+- **Format on save** — Ruff formatter runs on every `:w`, keeping the codebase clean without a manual task invocation.
+- **Terminal env injection** — every integrated terminal panel gets `PYTHONPATH=src`, `PYTHONDONTWRITEBYTECODE=1`, and `PYTHONUNBUFFERED=1` automatically, so `python -m bci_dapp.cli` and `pytest` work without `pip install -e .` in a fresh shell.
+- **File scanner exclusions** — `.ruff_cache/`, `__pycache__/`, `htmlcov/`, `.mypy_cache/`, `.venv/`, and other build artefacts are hidden from the file tree and search index.
+- **Git inline blame** — enabled with a 600 ms delay so it appears without disrupting fast typing.
+
+### `tasks.json` (32 tasks) — `Ctrl+Shift+P` → `task: spawn`
 
 | Group | Tasks |
 |---|---|
-| **Setup** | Install all dependencies, install pre-commit hooks, install debugpy |
+| **Setup** | Install all dependencies, install pre-commit hooks, install debugpy, create `.env` from template |
 | **Test** | All tests, with coverage, current file, fail-fast, per-module (EEG / LLM / Provenance), last-failed, open HTML report |
 | **Lint** | `ruff check`, `ruff check --fix`, `ruff format`, `ruff format --check`, current file, `mypy src/`, mypy current file, pre-commit all |
-| **Run** | Pipeline 5 sessions, 10 sessions, +export, LLM mode, DEBUG logging |
-| **Inspect** | Print version, dump ledger JSON, smoke-test EEG frame, smoke-test keypair |
+| **Run** | Pipeline 5 sessions, 10 sessions, +export, LLM mode, DEBUG logging, clear ledger |
+| **Inspect** | Print version, dump ledger JSON, verify chain integrity, smoke-test EEG frame, smoke-test keypair |
 
-### Debug configurations (17 total) - `Ctrl+Shift+D`
+All run/test tasks inject `PYTHONUNBUFFERED=1` so pipeline output streams in real time. The `allow_concurrent_runs` flag is `true` only for per-file tasks (lint current file, mypy current file, inspect tasks) that are safe to run in parallel; all suite-wide tasks are serialised.
+
+### `debug.json` (18 configs) — `Ctrl+Shift+D`
 
 | Group | Configurations |
 |---|---|
-| **Pipeline** | CLI 5 sessions, CLI 10 sessions + export, CLI LLM mode |
+| **Pipeline** | CLI 5 sessions, CLI 10 sessions + export, CLI LLM mode, CLI LLM mode (stop on entry) |
 | **pytest** | All tests, current test file, EEG Simulator, LLM Agent, Provenance & Ledger, fail-fast `-x`, last-failed |
 | **Module** | `eeg_simulator.py`, `blockchain_ledger.py`, `provenance.py`, `llm_agent.py`, current file, current file with stop-on-entry |
 | **Attach** | Attach to running `debugpy` server on `127.0.0.1:5678` |
 
-All debug configs set `PYTHONPATH=$ZED_WORKTREE_ROOT/src`, `justMyCode: false`, and `LOG_LEVEL=DEBUG`. For remote attach, start the process separately with:
+All debug configs set `PYTHONPATH=$ZED_WORKTREE_ROOT/src`, `PYTHONUNBUFFERED=1`, `justMyCode: false`, and `LOG_LEVEL=DEBUG`. For remote attach, start the process separately with:
 
 ```bash
 python -m debugpy --listen 5678 --wait-for-client -m bci_dapp.cli --n 5
+```
+
+**LLM mode debugging** requires `OPENAI_API_KEY` in the environment. The cleanest approach is to populate `.env` (use the *Setup: Create .env from template* task), then source it before launching Zed:
+
+```bash
+export $(grep -v '^#' .env | xargs) && zed .
 ```
 
 ---
 
 ## Module Reference
 
-### `eeg_simulator` - Signal generation
+### `eeg_simulator` — Signal generation
 
-**`EEGFrame`** `(frozen dataclass)` - one windowed snapshot of EEG features.
+**`EEGFrame`** `(frozen dataclass)` — one windowed snapshot of EEG features.
 
 | Field | Type | Description |
 |---|---|---|
@@ -345,7 +362,7 @@ python -m debugpy --listen 5678 --wait-for-client -m bci_dapp.cli --n 5
 | `dominant_band` | `str` | Band with the highest mean power |
 | `snr_db` | `float` | Simulated signal-to-noise ratio |
 
-**`EEGSimulator`** - generates `EEGFrame` objects from intent-biased sinusoidal signals.
+**`EEGSimulator`** — generates `EEGFrame` objects from intent-biased sinusoidal signals.
 
 | Method | Description |
 |---|---|
@@ -356,9 +373,9 @@ Channels: `Fp1`, `Fp2`, `C3`, `C4`. Bands: `delta (0.5–4 Hz)`, `theta (4–8 H
 
 ---
 
-### `llm_agent` - Intent classification
+### `llm_agent` — Intent classification
 
-**`IntentResult`** `(frozen dataclass)` - immutable classification output.
+**`IntentResult`** `(frozen dataclass)` — immutable classification output.
 
 | Field | Type | Description |
 |---|---|---|
@@ -369,19 +386,19 @@ Channels: `Fp1`, `Fp2`, `C3`, `C4`. Bands: `delta (0.5–4 Hz)`, `theta (4–8 H
 
 `to_payload()` returns a JSON-serialisable dict ready for provenance signing, containing `intent`, `confidence`, `reasoning`, and an `eeg_summary` of mean band powers.
 
-**`BCIAgent`** - classifies EEG features via LLM or rule-based fallback.
+**`BCIAgent`** — classifies EEG features via LLM or rule-based fallback.
 
 | Method | Description |
 |---|---|
 | `classify(features)` | Returns `IntentResult`; falls back to rule-based on any network / parse error |
 
-The LLM path calls any OpenAI-compatible `/chat/completions` endpoint at `temperature=0.2`. The rule-based fallback checks `dominant_band` first and uses band-power thresholds as tiebreakers - runs offline with no API key and is used by all tests.
+The LLM path calls any OpenAI-compatible `/chat/completions` endpoint at `temperature=0.2`. The rule-based fallback checks `dominant_band` first and uses band-power thresholds as tiebreakers — runs offline with no API key and is used by all tests.
 
 ---
 
-### `provenance` - Ed25519 signing
+### `provenance` — Ed25519 signing
 
-**`ProvenanceManager`** - keypair generation and session record signing.
+**`ProvenanceManager`** — keypair generation and session record signing.
 
 | Method | Description |
 |---|---|
@@ -393,9 +410,9 @@ The canonical form signed is a deterministic JSON serialisation of `{session_id,
 
 ---
 
-### `blockchain_ledger` - Hash-chained ledger
+### `blockchain_ledger` — Hash-chained ledger
 
-**`Block`** `(frozen dataclass)` - one immutable hash-linked entry.
+**`Block`** `(frozen dataclass)` — one immutable hash-linked entry.
 
 | Field | Type | Description |
 |---|---|---|
@@ -406,7 +423,7 @@ The canonical form signed is a deterministic JSON serialisation of `{session_id,
 | `previous_hash` | `str` | SHA-256 hash of the preceding block |
 | `block_hash` | `str` | SHA-256 hash of this block's canonical content |
 
-**`MockBlockchainLedger`** - append-only ledger with JSON persistence.
+**`MockBlockchainLedger`** — append-only ledger with JSON persistence.
 
 | Method / Property | Description |
 |---|---|
@@ -418,24 +435,24 @@ The canonical form signed is a deterministic JSON serialisation of `{session_id,
 | `height` | Number of non-genesis data blocks |
 | `head` | Most recently appended block |
 
-`verify_chain()` returns a `ChainVerification(valid, n_invalid, errors)` frozen dataclass. Replacing `_save` / `_load` with Anchor program calls converts this to an on-chain Solana ledger - the signing and hashing layers above are fully chain-agnostic.
+`verify_chain()` returns a `ChainVerification(valid, n_invalid, errors)` frozen dataclass. Replacing `_save` / `_load` with Anchor program calls converts this to an on-chain Solana ledger — the signing and hashing layers above are fully chain-agnostic.
 
 ---
 
-### `exceptions` - Error hierarchy
+### `exceptions` — Error hierarchy
 
 ```
 BCIDAppError
-├── SignatureError(message)              - Ed25519 sign / verify failures
-├── ChainIntegrityError(block_index, detail)  - hash-chain tamper detection
-└── ClassificationError(detail)          - intent classification failures
+├── SignatureError(message)                   — Ed25519 sign / verify failures
+├── ChainIntegrityError(block_index, detail)  — hash-chain tamper detection
+└── ClassificationError(detail)               — intent classification failures
 ```
 
 Always catch these specific types rather than bare `Exception`.
 
 ---
 
-### `settings` - Environment configuration
+### `settings` — Environment configuration
 
 ```python
 from bci_dapp.settings import settings
@@ -448,7 +465,7 @@ print(settings.ledger_path)    # "data/ledger.json"
 
 ---
 
-### `logging_config` - Logging setup
+### `logging_config` — Logging setup
 
 ```python
 from bci_dapp.logging_config import configure_logging
@@ -476,25 +493,25 @@ Library modules use `logger = logging.getLogger(__name__)` and never call `confi
 
 ## STAR Interview Story
 
-**Situation.** Children with motor impairments need a non-invasive way to interact with digital environments. Raw EEG signals are noisy, high-dimensional, and clinically meaningless without interpretation - and any interpretation used in a therapeutic context must be auditable and tamper-evident to maintain trust.
+**Situation.** Children with motor impairments need a non-invasive way to interact with digital environments. Raw EEG signals are noisy, high-dimensional, and clinically meaningless without interpretation — and any interpretation used in a therapeutic context must be auditable and tamper-evident to maintain trust.
 
-**Task.** Design and build a complete BCI DApp pipeline that takes simulated Emotiv EPOC signals, classifies user intent with an LLM agent, and commits every interpretation to a cryptographically signed, hash-chained ledger - demonstrating both rig-core agentic AI and Web3 blockchain architecture in a single runnable project.
+**Task.** Design and build a complete BCI DApp pipeline that takes simulated Emotiv EPOC signals, classifies user intent with an LLM agent, and commits every interpretation to a cryptographically signed, hash-chained ledger — demonstrating both rig-core agentic AI and Web3 blockchain architecture in a single runnable project.
 
 **Action.**
 - Built `EEGSimulator` to produce intent-biased, statistically plausible 4-channel EEG at 256 Hz with FFT band-power extraction. All randomness flows through a seeded numpy Generator so any test run is exactly reproducible.
 - Wired `BCIAgent` against a rig-core / OpenAI-compatible `/chat/completions` endpoint with a BCI-specific system prompt and `temperature=0.2`. A deterministic rule-based fallback handles offline / CI runs and serves as the test double.
-- Implemented `ProvenanceManager` using Ed25519 (cryptography ≥ 42) - every session payload is canonically serialised and signed before it touches the ledger. Signatures are self-contained and verifiable without trusting any server.
+- Implemented `ProvenanceManager` using Ed25519 (cryptography ≥ 42) — every session payload is canonically serialised and signed before it touches the ledger. Signatures are self-contained and verifiable without trusting any server.
 - Built `MockBlockchainLedger` with SHA-256 hash-chaining, frozen immutable `Block` dataclasses, JSON persistence, and a full `verify_chain()` integrity check.
 - Applied the python_template standard: `src/` layout, `pyproject.toml` (hatchling, ruff, mypy strict, pytest-cov ≥ 80%), `frozen=True, slots=True` dataclasses, `collections.abc.Sequence`, parameterised return types throughout, pre-commit hooks, and GitHub Actions CI matrix on Python 3.11 + 3.12.
-- Added Zed IDE integration: 29 task runner configs and 17 DAP debug configurations covering every module, pytest variant, CLI option, and remote-attach scenario.
+- Added complete Zed IDE integration: `settings.json` for workspace-aware LSP/formatter config, 32 task runner configs, and 18 DAP debug configurations covering every module, pytest variant, CLI option, and remote-attach scenario.
 
-**Result.** A fully runnable, screen-capturable demo that shows EEG → LLM → signed provenance → verified chain in under 200 ms per session. 41 tests, 100% passing. Replacing `_save`/`_load` in `MockBlockchainLedger` with Anchor program calls produces a production Solana deployment - the signing, hashing, and classification layers are chain-agnostic.
+**Result.** A fully runnable, screen-capturable demo that shows EEG → LLM → signed provenance → verified chain in under 200 ms per session. 41 tests, 100% passing. Replacing `_save`/`_load` in `MockBlockchainLedger` with Anchor program calls produces a production Solana deployment — the signing, hashing, and classification layers are chain-agnostic.
 
 ---
 
 ## Author
 
-**Murtaza Ali Imtiaz** · Polar Bear Systems · Pakistan (remote - open to US/EU)
+**Murtaza Ali Imtiaz** · Polar Bear Systems · Pakistan (remote — open to US/EU)
 [very.kool.king@gmail.com](mailto:very.kool.king@gmail.com) · [GitHub](https://github.com/murtazai) · [LinkedIn](https://linkedin.com/in/murtazai)
 
 ## License

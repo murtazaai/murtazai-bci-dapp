@@ -32,6 +32,21 @@
     "reveal": "always",
     "tags": ["build"],
   },
+  {
+    // Creates .env from the committed template so secrets are never committed.
+    // Safe to run repeatedly: skips creation when .env already exists.
+    "label": "Setup: Create .env from template",
+    "command": "bash",
+    "args": [
+      "-c",
+      "[ -f .env ] && echo '.env already exists – skipping.' || (cp .env.example .env && echo '.env created from .env.example  →  fill in OPENAI_API_KEY before running --llm mode.')",
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "tags": ["build"],
+  },
 
   // ─────────────────────────────────────────────────────────────────────────
   // TEST
@@ -42,6 +57,7 @@
     "args": ["-m", "pytest", "tests/", "-v"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,
@@ -63,6 +79,7 @@
     ],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,
@@ -76,6 +93,7 @@
     "args": ["-m", "pytest", "$ZED_FILE", "-v"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,
@@ -89,6 +107,7 @@
     "args": ["-m", "pytest", "$ZED_FILE", "-v", "-x"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,
@@ -102,6 +121,7 @@
     "args": ["-m", "pytest", "tests/test_eeg_simulator.py", "-v"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,
@@ -115,6 +135,7 @@
     "args": ["-m", "pytest", "tests/test_llm_agent.py", "-v"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,
@@ -128,6 +149,7 @@
     "args": ["-m", "pytest", "tests/test_provenance_ledger.py", "-v"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,
@@ -141,6 +163,7 @@
     "args": ["-m", "pytest", "--last-failed", "-v"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": false,
@@ -149,6 +172,7 @@
     "tags": ["test"],
   },
   {
+    // Serves htmlcov/ on http://localhost:8080 — run "Test: Run with coverage" first.
     "label": "Test: Show coverage report (HTML)",
     "command": "python",
     "args": ["-m", "http.server", "8080", "--directory", "htmlcov"],
@@ -156,6 +180,7 @@
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "reveal": "always",
+    "tags": ["test"],
   },
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -202,6 +227,7 @@
     "tags": ["build"],
   },
   {
+    // allow_concurrent_runs: true → safe to fire on each file save independently.
     "label": "Lint: Ruff check current file",
     "command": "python",
     "args": ["-m", "ruff", "check", "$ZED_FILE"],
@@ -225,6 +251,7 @@
     "tags": ["build"],
   },
   {
+    // allow_concurrent_runs: true → safe to invoke independently per file.
     "label": "Type: Mypy current file",
     "command": "python",
     "args": ["-m", "mypy", "$ZED_FILE"],
@@ -257,6 +284,7 @@
     "args": ["-m", "bci_dapp.cli", "--n", "5"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "INFO",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
@@ -271,6 +299,7 @@
     "args": ["-m", "bci_dapp.cli", "--n", "10"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "INFO",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
@@ -285,6 +314,7 @@
     "args": ["-m", "bci_dapp.cli", "--n", "5", "--export"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "INFO",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
@@ -294,11 +324,13 @@
     "tags": ["run"],
   },
   {
+    // Requires OPENAI_API_KEY in .env (run "Setup: Create .env from template" first).
     "label": "Run: BCI pipeline (LLM mode)",
     "command": "python",
     "args": ["-m", "bci_dapp.cli", "--n", "5", "--llm"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
@@ -313,10 +345,25 @@
     "args": ["-m", "bci_dapp.cli", "--n", "5"],
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "cwd": "$ZED_WORKTREE_ROOT",
     "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "tags": ["run"],
+  },
+  {
+    // Removes data/ledger.json so the next pipeline run starts with a fresh genesis block.
+    "label": "Run: Clear ledger data",
+    "command": "bash",
+    "args": [
+      "-c",
+      "rm -f data/ledger.json && echo 'Ledger cleared – next pipeline run will create a fresh genesis block.'",
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
     "allow_concurrent_runs": false,
     "reveal": "always",
     "tags": ["run"],
@@ -336,6 +383,7 @@
     "use_new_terminal": false,
     "allow_concurrent_runs": true,
     "reveal": "always",
+    "tags": ["build"],
   },
   {
     "label": "Inspect: Show ledger chain",
@@ -351,6 +399,24 @@
     "use_new_terminal": false,
     "allow_concurrent_runs": true,
     "reveal": "always",
+    "tags": ["build"],
+  },
+  {
+    // Verifies SHA-256 hash links across every block in data/ledger.json.
+    "label": "Inspect: Verify chain integrity",
+    "command": "python",
+    "args": [
+      "-c",
+      "from pathlib import Path; from bci_dapp.blockchain_ledger import MockBlockchainLedger; p=Path('data/ledger.json'); (lambda l: print(f'✓ Chain valid  blocks={l.height}') if (v:=l.verify_chain()).valid else [print(f'✗ INVALID  n_invalid={v.n_invalid}'), [print(f'  • {e}') for e in v.errors]])(MockBlockchainLedger(p)) if p.exists() else print('No ledger at data/ledger.json – run the pipeline first.')",
+    ],
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+    },
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": true,
+    "reveal": "always",
+    "tags": ["build"],
   },
   {
     "label": "Inspect: Generate EEG frame (smoke test)",
@@ -366,6 +432,7 @@
     "use_new_terminal": false,
     "allow_concurrent_runs": true,
     "reveal": "always",
+    "tags": ["build"],
   },
   {
     "label": "Inspect: Generate keypair (smoke test)",
@@ -381,5 +448,6 @@
     "use_new_terminal": false,
     "allow_concurrent_runs": true,
     "reveal": "always",
+    "tags": ["build"],
   },
 ]

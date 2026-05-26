@@ -1,0 +1,152 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Zed workspace settings for murtazai-bci-dapp
+//
+// Mirrors the tool configuration in pyproject.toml so the IDE and the CLI
+// toolchain are always in sync.  Never edit one without checking the other.
+//
+// Reference: https://zed.dev/docs/configuring-zed
+// ─────────────────────────────────────────────────────────────────────────────
+
+{
+  // ── Global editor defaults ────────────────────────────────────────────────
+  "tab_size": 4,
+  "hard_tabs": false,
+  "preferred_line_length": 100,
+  "soft_wrap": "preferred_line_length",
+  "format_on_save": "on",
+  "ensure_final_newline_on_save": true,
+  "remove_trailing_whitespace_on_save": true,
+  "show_whitespaces": "selection",
+  "show_inline_completions": true,
+
+  // ── File scanner - skip build/cache artefacts ────────────────────────────
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.ruff_cache",
+    "**/__pycache__",
+    "**/.pytest_cache",
+    "**/.mypy_cache",
+    "**/.hatch",
+    "**/htmlcov",
+    "**/*.egg-info",
+    "**/dist",
+    "**/build",
+    "**/.venv",
+    "**/venv",
+    "**/*.pyc"
+  ],
+
+  // ── Per-language overrides ────────────────────────────────────────────────
+  "languages": {
+    "Python": {
+      // Pyright for type intelligence; Ruff for lint + format.
+      // Ruff is the formatter of record - matches `ruff format` in pyproject.toml.
+      "language_servers": ["pyright", "ruff"],
+      "formatter": {
+        "language_server": { "name": "ruff" }
+      },
+      "format_on_save": "on",
+      "tab_size": 4,
+      "hard_tabs": false,
+      "preferred_line_length": 100
+    },
+    "TOML": {
+      "tab_size": 4,
+      "format_on_save": "on"
+    },
+    "YAML": {
+      "tab_size": 2,
+      "format_on_save": "on"
+    },
+    "JSON": {
+      "tab_size": 2,
+      "format_on_save": "on"
+    },
+    "Markdown": {
+      "format_on_save": "off",
+      "soft_wrap": "preferred_line_length",
+      "preferred_line_length": 100
+    }
+  },
+
+  // ── LSP configuration ─────────────────────────────────────────────────────
+  "lsp": {
+
+    // ── Pyright ──────────────────────────────────────────────────────────────
+    // Strict mode mirrors [tool.mypy] strict=true in pyproject.toml.
+    // extraPaths includes src/ so `from bci_dapp.xxx import yyy` resolves
+    // without installing the package in editable mode first.
+    "pyright": {
+      "settings": {
+        "python": {
+          "pythonPath": ".venv/bin/python",
+          "venvPath": ".",
+          "venv": ".venv"
+        },
+        "pyright": {
+          "typeCheckingMode": "strict",
+          "reportMissingTypeStubs": false,
+          "reportUnknownMemberType": false
+        },
+        "analysis": {
+          "autoSearchPaths": true,
+          "extraPaths": ["src"],
+          "diagnosticMode": "workspace",
+          "useLibraryCodeForTypes": true
+        }
+      }
+    },
+
+    // ── Ruff LSP ─────────────────────────────────────────────────────────────
+    // Rule set and ignore list must stay in sync with [tool.ruff.lint] and
+    // [tool.ruff.format] in pyproject.toml.
+    "ruff": {
+      "initialization_options": {
+        "settings": {
+          "lineLength": 100,
+          "lint": {
+            "select": ["E", "W", "F", "I", "UP", "B", "C4", "SIM", "TCH", "RUF"],
+            "ignore": ["E501", "TC001", "TC003"]
+          },
+          "format": {
+            "quoteStyle": "double",
+            "indentStyle": "space",
+            "skipMagicTrailingComma": false
+          },
+          "isort": {
+            "knownFirstParty": ["bci_dapp"]
+          }
+        }
+      }
+    }
+  },
+
+  // ── Integrated terminal ───────────────────────────────────────────────────
+  // These env vars are injected into every terminal panel Zed opens.
+  // PYTHONPATH → editable-install resolution without pip install -e .
+  // PYTHONDONTWRITEBYTECODE → no .pyc clutter in src/
+  // PYTHONUNBUFFERED → real-time log output from the pipeline
+  "terminal": {
+    "env": {
+      "PYTHONPATH": "src",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTHONUNBUFFERED": "1"
+    },
+    "working_directory": "current_project_directory",
+    "shell": "system"
+  },
+
+  // ── Git integration ───────────────────────────────────────────────────────
+  "git": {
+    "inline_blame": {
+      "enabled": true,
+      "delay_ms": 600
+    }
+  },
+
+  // ── Telemetry ─────────────────────────────────────────────────────────────
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  }
+}

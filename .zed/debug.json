@@ -11,6 +11,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "console": "integratedTerminal",
@@ -26,6 +27,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "console": "integratedTerminal",
@@ -33,6 +35,9 @@
     "stopOnEntry": false,
   },
   {
+    // Requires OPENAI_API_KEY.  Set it in .env (run "Setup: Create .env from template"
+    // task first), then export it into your shell before launching Zed:
+    //   export $(grep -v '^#' .env | xargs)
     "label": "Debug: BCI pipeline (LLM mode)",
     "adapter": "debugpy",
     "request": "launch",
@@ -41,13 +46,30 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
-      // Set OPENAI_API_KEY in .env or override here:
-      // "OPENAI_API_KEY": "sk-..."
     },
     "console": "integratedTerminal",
     "justMyCode": false,
     "stopOnEntry": false,
+  },
+  {
+    // Same as LLM mode but breaks immediately on entry - useful for stepping
+    // through BCIAgent.classify() before the first API call is made.
+    "label": "Debug: BCI pipeline (LLM mode, stop on entry)",
+    "adapter": "debugpy",
+    "request": "launch",
+    "module": "bci_dapp.cli",
+    "args": ["--n", "3", "--llm"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "env": {
+      "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
+      "LOG_LEVEL": "DEBUG",
+    },
+    "console": "integratedTerminal",
+    "justMyCode": false,
+    "stopOnEntry": true,
   },
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -62,6 +84,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "console": "integratedTerminal",
     "justMyCode": false,
@@ -76,6 +99,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "console": "integratedTerminal",
     "justMyCode": false,
@@ -90,6 +114,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "console": "integratedTerminal",
     "justMyCode": false,
@@ -104,6 +129,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "console": "integratedTerminal",
     "justMyCode": false,
@@ -118,6 +144,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "console": "integratedTerminal",
     "justMyCode": false,
@@ -132,6 +159,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "console": "integratedTerminal",
     "justMyCode": false,
@@ -146,6 +174,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
     },
     "console": "integratedTerminal",
     "justMyCode": false,
@@ -163,6 +192,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "console": "integratedTerminal",
@@ -177,6 +207,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "console": "integratedTerminal",
@@ -191,6 +222,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "console": "integratedTerminal",
@@ -205,6 +237,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "console": "integratedTerminal",
@@ -219,6 +252,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "console": "integratedTerminal",
@@ -233,6 +267,7 @@
     "cwd": "$ZED_WORKTREE_ROOT",
     "env": {
       "PYTHONPATH": "$ZED_WORKTREE_ROOT/src",
+      "PYTHONUNBUFFERED": "1",
       "LOG_LEVEL": "DEBUG",
     },
     "console": "integratedTerminal",
@@ -242,8 +277,8 @@
 
   // ─────────────────────────────────────────────────────────────────────────
   // ATTACH - connect to a running debugpy server
-  // Use when the process is started separately with:
-  //   python -m debugpy --listen 5678 --wait-for-client -m bci_dapp.cli
+  // Start the target process separately with:
+  //   python -m debugpy --listen 5678 --wait-for-client -m bci_dapp.cli --n 5
   // ─────────────────────────────────────────────────────────────────────────
   {
     "label": "Debug: Attach to debugpy (port 5678)",
